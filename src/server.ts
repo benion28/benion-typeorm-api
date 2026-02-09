@@ -1,16 +1,21 @@
 // src/server.ts
 import app from "./app";
 import { AppDataSource } from "@/config/database";
-
-const PORT = process.env.PORT || 4000;
+import { env, validateEnv } from "@/config/env";
 
 async function bootstrap() {
   try {
+    // Validate environment variables
+    validateEnv();
+
+    // Initialize database connection
     await AppDataSource.initialize();
     console.log("📦 Database connected");
 
-    app.listen(PORT, () => {
-      console.log(`🚀 Server running on port ${PORT}`);
+    // Start server
+    app.listen(env.PORT, () => {
+      console.log(`🚀 Server running on port ${env.PORT}`);
+      console.log(`📍 Environment: ${env.NODE_ENV}`);
     });
   } catch (error) {
     console.error("❌ Failed to start server", error);

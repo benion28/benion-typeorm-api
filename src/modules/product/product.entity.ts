@@ -1,20 +1,20 @@
 // modules/product/product.entity.ts
 import { Entity, Column, ManyToOne, JoinColumn } from "typeorm";
-import { BaseEntity } from "@/common/base.entity";
-import { User } from "@/modules/user/user.entity";
+import { BaseEntity } from "../../common/base.entity";
+import { User } from "../user/user.entity";
 
 @Entity("products")
 export class Product extends BaseEntity {
   @Column()
-  title: string;
+  title!: string;
 
-  @Column("decimal")
-  price: number;
+  @Column("decimal", { precision: 10, scale: 2 })
+  price!: number;
 
   @Column()
-  created_by_id: string;
+  creator_id!: string;
 
-  @ManyToOne(() => User, user => user.posts)
-  @JoinColumn({ name: "created_by_id" })
-  created_by: User;
+  @ManyToOne(() => User, user => user.products)
+  @JoinColumn({ name: "creator_id" })
+  creator!: User;
 }

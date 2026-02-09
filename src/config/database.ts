@@ -3,16 +3,20 @@ import "reflect-metadata";
 import { DataSource } from "typeorm";
 import { User } from "@/modules/user/user.entity";
 import { Product } from "@/modules/product/product.entity";
+import { envConfig } from "./env";
+
+const env = envConfig;
 
 export const AppDataSource = new DataSource({
-  type: "postgres", // or "mysql"
-  host: process.env.DB_HOST,
-  port: Number(process.env.DB_PORT),
-  username: process.env.DB_USERNAME,
-  password: process.env.DB_PASSWORD,
-  database: process.env.DB_NAME,
-  synchronize: true, // ❌ disable in production
-  logging: false,
+  type: env.DB_ENGINE,
+  host: env.DB_HOST,
+  port: env.DB_PORT,
+  username: env.DB_USERNAME,
+  password: env.DB_PASSWORD,
+  database: env.DB_NAME,
+  synchronize: env.NODE_ENV !== "production", // Only in development
+  logging: env.NODE_ENV !== "production", // Only in development
   entities: [User, Product],
-  migrations: ["src/database/migrations/*.ts"],
+  migrations: ["dist/database/migrations/*.js"],
+  migrationsTableName: "migrations",
 });
