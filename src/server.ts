@@ -1,6 +1,6 @@
 // src/server.ts
 import app from "./app";
-import { AppDataSource } from "@/config/database";
+import { prisma } from "@/lib/prisma";
 import { envConfig, validateEnv } from "@/config/env";
 
 const env = envConfig;
@@ -10,9 +10,9 @@ const bootstrap = async () => {
     // Validate environment variables
     validateEnv();
 
-    // Initialize database connection
-    await AppDataSource.initialize();
-    console.log("📦 Database connected");
+    // Test database connection
+    await prisma.$connect();
+    console.log("📦 Database connected with Prisma");
 
     // Start server
     app.listen(env.PORT, () => {
@@ -21,8 +21,22 @@ const bootstrap = async () => {
     });
   } catch (error) {
     console.error("❌ Failed to start server", error);
+    await prisma.$disconnect();
     process.exit(1);
   }
 }
+
+// Graceful shutdown
+process.on('SIGINT', async () => {
+  console.log('🛑 Shutting down gracefully...');
+  await prisma.$disconnect();
+  process.exit(0);
+});
+
+process.on('SIGTERM', async () => {
+  console.log('🛑 Shutting down gracefully...');
+  await prisma.$disconnect();
+  process.exit(0);
+});
 
 bootstrap();

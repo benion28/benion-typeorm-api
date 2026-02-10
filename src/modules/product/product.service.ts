@@ -1,54 +1,100 @@
 // modules/product/product.service.ts
-import { ProductRepository } from "./product.repository";
-import { Product } from "./product.entity";
+import { prisma } from "@/lib/prisma";
 import { ICreateProductDTO, IUpdateProductDTO } from "@/types";
+import { Product } from "@prisma/client";
 
 export class ProductService {
   async findAll(
     page?: number,
     limit?: number
   ): Promise<{ products: Product[]; total: number }> {
-    const queryOptions: any = {
-      relations: ["creator"],
-    };
+    const skip = page && limit ? (page - 1) * limit : undefined;
+    const take = limit;
 
-    // Add pagination if provided
-    if (page !== undefined && limit !== undefined) {
-      queryOptions.skip = (page - 1) * limit;
-      queryOptions.take = limit;
-    }
-
-    const [products, total] = await ProductRepository.findAndCount(queryOptions);
+    const [products, total] = await Promise.all([
+      prisma.product.findMany({
+        skip,
+        take,
+        include: {
+          creator: {
+            select: {
+              id: true,
+              first_name: true,
+              last_name: true,
+              email: true,
+              role: true,
+              creator_id: true,
+              created_at: true,
+              updated_at: true,
+            }
+          }
+        },
+        where: {
+          deleted_at: null
+        }
+      }),
+      prisma.product.count({
+        where: {
+          deleted_at: null
+        }
+      })
+    ]);
 
     return { products, total };
   }
 
   async findById(id: string): Promise<Product | null> {
-    return ProductRepository.findOne({ 
-      where: { id },
-      relations: ["creator"]
+    return prisma.product.findFirst({ 
+      where: { 
+        id,
+        deleted_at: null
+      },
+      include: {
+        creator: {
+          select: {
+            id: true,
+            first_name: true,
+            last_name: true,
+            email: true,
+            role: true,
+            creator_id: true,
+            created_at: true,
+            updated_at: true,
+          }
+        }
+      }
     });
   }
 
   async create(data: ICreateProductDTO, userId: string): Promise<Product> {
-    const product = ProductRepository.create({
-      ...data,
-      creator_id: userId
+    return prisma.product.create({
+      data: {
+        ...data,
+        creator_id: userId
+      }
     });
-    return ProductRepository.save(product);
   }
 
   async update(id: string, data: IUpdateProductDTO): Promise<Product | null> {
-    await ProductRepository.update(id, data);
+    await prisma.product.update({
+      where: { id },
+      data
+    });
+    
     return this.findById(id);
   }
 
   async delete(id: string): Promise<void> {
-    await ProductRepository.softDelete(id);
+    await prisma.product.update({
+      where: { id },
+      data: { deleted_at: new Date() }
+    });
   }
 
   async hardDelete(id: string): Promise<void> {
-    await ProductRepository.delete(id);
+    await prisma.product.delete({
+      where: { id }
+    });
   }
 }
 

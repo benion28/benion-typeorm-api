@@ -1,6 +1,6 @@
-# TypeORM REST API
+# Prisma REST API
 
-A complete REST API built with Express, TypeORM, and MySQL/PostgreSQL with full authentication, role-based access, and database seeding.
+A complete REST API built with Express, Prisma, and MySQL with full authentication, role-based access, and database seeding.
 
 ## Features
 
@@ -13,20 +13,18 @@ A complete REST API built with Express, TypeORM, and MySQL/PostgreSQL with full 
 - ✅ Soft deletes
 - ✅ Password hashing with bcrypt
 - ✅ TypeScript strict mode with full type safety
-- ✅ Database migrations
-- ✅ Database seeders
-- ✅ Dynamic database engine support (MySQL/PostgreSQL)
+- ✅ Database migrations with Prisma
+- ✅ Database seeding with Prisma
 - ✅ Environment configuration with validation
 
 ## Tech Stack
 
 - **Runtime**: Node.js with TypeScript
 - **Framework**: Express.js
-- **ORM**: TypeORM
-- **Database**: MySQL (configurable to PostgreSQL)
+- **ORM**: Prisma
+- **Database**: MySQL
 - **Authentication**: JWT (jsonwebtoken)
 - **Password Hashing**: bcrypt
-- **Validation**: class-validator & class-transformer
 
 ## Setup
 
@@ -39,29 +37,35 @@ npm install
 ```env
 PORT=4000
 NODE_ENV=development
+
+# Database connection components (DATABASE_URL is constructed automatically)
 DB_ENGINE=mysql
 DB_HOST=localhost
 DB_PORT=3306
 DB_USERNAME=root
 DB_PASSWORD=your_password
 DB_NAME=sql_test_db
+
 JWT_SECRET=your_secret_key
 API_KEY=your_api_key_here_change_in_production
 ```
+
+**Note:** The `DATABASE_URL` is automatically constructed from the individual database components. For PostgreSQL, change `DB_ENGINE=postgresql`.
 
 3. **Create the database:**
 ```sql
 CREATE DATABASE sql_test_db;
 ```
 
-4. **Run migrations:**
+4. **Generate Prisma client and push schema:**
 ```bash
-npm run migration:run
+npx prisma generate
+npx prisma db push
 ```
 
 5. **Seed the database (optional):**
 ```bash
-npm run seed
+npm run db:seed
 ```
 
 This will create:
@@ -71,6 +75,26 @@ This will create:
 6. **Run the development server:**
 ```bash
 npm run dev
+```
+
+## Database Management
+
+### **Development Workflow:**
+```bash
+# Generate Prisma client after schema changes
+npm run db:generate
+
+# Push schema changes to database (development)
+npm run db:push
+
+# Create and apply migrations (production-ready)
+npm run db:migrate
+
+# Seed database with sample data
+npm run db:seed
+
+# Open Prisma Studio (database GUI)
+npm run db:studio
 ```
 
 ## API Endpoints
@@ -420,18 +444,16 @@ src/
 - `npm run dev` - Start development server with hot reload
 - `npm run build` - Build for production
 - `npm start` - Run production build
-- `npm run seed` - Seed database with sample data
-- `npm run migration:run` - Run pending migrations
-- `npm run migration:revert` - Revert last migration
-- `npm run migration:show` - Show migration status
-- `npm run migration:generate` - Generate migration from entity changes
-- `npm run migration:create` - Create empty migration file
-
-See [MIGRATIONS.md](./MIGRATIONS.md) for detailed migration guide.
+- `npm run db:generate` - Generate Prisma client
+- `npm run db:push` - Push schema to database (development)
+- `npm run db:migrate` - Create and run migrations (production)
+- `npm run db:migrate:deploy` - Deploy migrations (production)
+- `npm run db:seed` - Seed database with sample data
+- `npm run db:studio` - Open Prisma Studio
 
 ## Seeded Data
 
-After running `npm run seed`, you'll have:
+After running `npm run db:seed`, you'll have:
 
 **Users:**
 - admin@example.com (role: admin)
@@ -449,7 +471,7 @@ All passwords: `password123`
 |----------|-------------|---------|
 | PORT | Server port | 4000 |
 | NODE_ENV | Environment | development |
-| DB_ENGINE | Database type (mysql/postgres) | mysql |
+| DB_ENGINE | Database type (mysql/postgresql) | mysql |
 | DB_HOST | Database host | localhost |
 | DB_PORT | Database port | 3306 |
 | DB_USERNAME | Database user | - |
@@ -458,19 +480,19 @@ All passwords: `password123`
 | JWT_SECRET | JWT secret key | - |
 | API_KEY | API key for non-authenticated routes | - |
 
+**Note:** `DATABASE_URL` is automatically constructed from the individual DB_* variables.
+
 ## Development vs Production
 
 ### Development Mode
 - Set `NODE_ENV=development` in `.env`
-- `synchronize: true` - TypeORM auto-creates/updates tables
-- Good for rapid prototyping
-- **Warning:** Can cause data loss
+- Use `npm run db:push` for rapid schema changes
+- Prisma logging enabled for debugging
 
 ### Production Mode
 - Set `NODE_ENV=production` in `.env`
-- `synchronize: false` - Only migrations modify schema
-- Safe and version-controlled
-- Required for production deployments
+- Use `npm run db:migrate` for version-controlled schema changes
+- Deploy migrations with `npm run db:migrate:deploy`
 
 ## Testing the API
 

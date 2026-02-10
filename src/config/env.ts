@@ -3,7 +3,7 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
-type DatabaseEngine = "mysql" | "postgres";
+type DatabaseEngine = "mysql" | "postgresql";
 
 interface EnvConfig {
   PORT: number;
@@ -15,6 +15,7 @@ interface EnvConfig {
   DB_USERNAME: string;
   DB_PASSWORD: string;
   DB_NAME: string;
+  DATABASE_URL: string;
   JWT_SECRET: string;
   API_KEY: string;
 }
@@ -27,16 +28,32 @@ const getEnvVariable = (key: string, defaultValue?: string): string => {
   return value;
 };
 
+// Construct DATABASE_URL from individual components
+const constructDatabaseUrl = (): string => {
+  const engine = getEnvVariable("DB_ENGINE", "mysql");
+  const username = getEnvVariable("DB_USERNAME");
+  const password = getEnvVariable("DB_PASSWORD");
+  const host = getEnvVariable("DB_HOST");
+  const port = getEnvVariable("DB_PORT");
+  const database = getEnvVariable("DB_NAME");
+
+  // Handle different database engines
+  const protocol = engine === "postgresql" ? "postgresql" : "mysql";
+  
+  return `${protocol}://${username}:${password}@${host}:${port}/${database}`;
+};
+
 export const envConfig: EnvConfig = {
   PORT: parseInt(getEnvVariable("PORT", "4000"), 10),
-  APP_NAME: getEnvVariable("APP_NAME", "Benion"),
+  APP_NAME: getEnvVariable("APP_NAME", "Benion Prisma API"),
   NODE_ENV: getEnvVariable("NODE_ENV", "development"),
-  DB_ENGINE: getEnvVariable("DB_ENGINE", "postgres") as DatabaseEngine,
+  DB_ENGINE: getEnvVariable("DB_ENGINE", "mysql") as DatabaseEngine,
   DB_HOST: getEnvVariable("DB_HOST"),
   DB_PORT: parseInt(getEnvVariable("DB_PORT"), 10),
   DB_USERNAME: getEnvVariable("DB_USERNAME"),
   DB_PASSWORD: getEnvVariable("DB_PASSWORD"),
   DB_NAME: getEnvVariable("DB_NAME"),
+  DATABASE_URL: constructDatabaseUrl(),
   JWT_SECRET: getEnvVariable("JWT_SECRET"),
   API_KEY: getEnvVariable("API_KEY"),
 };
@@ -63,12 +80,13 @@ export const validateEnv = (): void => {
   }
 
   // Validate DB_ENGINE
-  if (!["mysql", "postgres"].includes(envConfig.DB_ENGINE)) {
+  if (!["mysql", "postgresql"].includes(envConfig.DB_ENGINE)) {
     throw new Error(
-      `Invalid DB_ENGINE: ${envConfig.DB_ENGINE}. Must be 'mysql' or 'postgres'`
+      `Invalid DB_ENGINE: ${envConfig.DB_ENGINE}. Must be 'mysql' or 'postgresql'`
     );
   }
 
   console.log("✅ Environment variables validated");
-  console.log(`📊 Database Engine: ${envConfig.DB_ENGINE}`);
+  console.log(`📊 Database: ${envConfig.DB_ENGINE} at ${envConfig.DB_HOST}:${envConfig.DB_PORT}`);
+  console.log(`🔗 Database URL: ${envConfig.DATABASE_URL}`);
 };

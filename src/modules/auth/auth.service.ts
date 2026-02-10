@@ -22,6 +22,10 @@ export class AuthService {
       data.password
     );
 
+    if (!user.id) {
+      throw new Error("User ID not found after creation");
+    }
+
     const accessToken = this.generateAccessToken(user.id);
     const refreshToken = this.generateRefreshToken(user.id);
 
@@ -36,6 +40,14 @@ export class AuthService {
     const user = await userService.findByEmail(data.email);
     if (!user) {
       throw new Error("Invalid credentials");
+    }
+
+    if (!user.id) {
+      throw new Error("User ID not found");
+    }
+
+    if (!user.password) {
+      throw new Error("User password not found");
     }
 
     const isValidPassword = await bcrypt.compare(data.password, user.password);
@@ -97,15 +109,21 @@ export class AuthService {
     newPassword: string
   ): Promise<void> {
     // Get user with password field
-    const user = await userService.findByEmail(
-      (await userService.findById(userId))?.email || ""
-    );
+    const userById = await userService.findById(userId);
+    if (!userById?.email) {
+      throw new Error("User not found");
+    }
 
+    const user = await userService.findByEmail(userById.email);
     if (!user) {
       throw new Error("User not found");
     }
 
     // Verify current password
+    if (!user.password) {
+      throw new Error("User password not found");
+    }
+    
     const isValidPassword = await bcrypt.compare(currentPassword, user.password);
     if (!isValidPassword) {
       throw new Error("Current password is incorrect");
@@ -117,7 +135,7 @@ export class AuthService {
 
   private generateAccessToken(userId: string): string {
     return jwt.sign({ userId, type: "access" }, env.JWT_SECRET, {
-      expiresIn: "24h", // Short-lived access token
+      expiresIn: "15m", // Short-lived access token
     });
   }
 

@@ -1,0 +1,56 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = env("DB_ENGINE")
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id         String    @id @default(cuid())
+  first_name String
+  last_name  String
+  email      String    @unique
+  password   String
+  role       UserRole  @default(user)
+  creator_id String?
+  created_at DateTime  @default(now())
+  updated_at DateTime  @updatedAt
+  deleted_at DateTime?
+
+  // Relations
+  creator       User?     @relation("UserCreator", fields: [creator_id], references: [id], onDelete: SetNull)
+  created_users User[]    @relation("UserCreator")
+  products      Product[]
+
+  @@index([email])
+  @@index([creator_id])
+  @@map("users")
+}
+
+model Product {
+  id         String    @id @default(cuid())
+  title      String    @unique
+  price      Decimal   @db.Decimal(10, 2)
+  creator_id String
+  created_at DateTime  @default(now())
+  updated_at DateTime  @updatedAt
+  deleted_at DateTime?
+
+  // Relations
+  creator User @relation(fields: [creator_id], references: [id], onDelete: Cascade)
+
+  @@index([creator_id])
+  @@index([title])
+  @@map("products")
+}
+
+enum UserRole {
+  admin
+  moderator
+  user
+}

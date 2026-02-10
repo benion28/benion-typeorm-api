@@ -23,7 +23,7 @@ app.get("/", (_, res) => {
   ResponseHandler.success(
     res,
     { status: "running", version: "1.0.0" },
-    `${env.APP_NAME || "TypeORM"} API is running`
+    `${env.APP_NAME || "Prisma"} API is running`
   );
 });
 
