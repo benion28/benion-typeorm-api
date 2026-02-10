@@ -5,6 +5,8 @@ A complete REST API built with Express, TypeORM, and MySQL/PostgreSQL with full 
 ## Features
 
 - ✅ User authentication (register/login) with JWT
+- ✅ API key authentication for non-authenticated routes
+- ✅ Pagination support for list endpoints
 - ✅ Role-based access control (admin, moderator, user)
 - ✅ Product CRUD operations
 - ✅ User management with creator tracking
@@ -44,6 +46,7 @@ DB_USERNAME=root
 DB_PASSWORD=your_password
 DB_NAME=sql_test_db
 JWT_SECRET=your_secret_key
+API_KEY=your_api_key_here_change_in_production
 ```
 
 3. **Create the database:**
@@ -72,12 +75,15 @@ npm run dev
 
 ## API Endpoints
 
+**Note:** All non-authenticated routes require an API key in the `x-api-key` header.
+
 ### Authentication
 
 **Register**
 ```http
 POST /api/auth/register
 Content-Type: application/json
+x-api-key: your_api_key_here_change_in_production
 
 {
   "email": "user@example.com",
@@ -89,21 +95,98 @@ Content-Type: application/json
 ```http
 POST /api/auth/login
 Content-Type: application/json
+x-api-key: your_api_key_here_change_in_production
 
 {
   "email": "user@example.com",
   "password": "password123"
 }
 
-Response: { "user": {...}, "token": "jwt_token" }
+Response: { 
+  "user": {...}, 
+  "access_token": "jwt_access_token",
+  "refresh_token": "jwt_refresh_token"
+}
 ```
+
+**Refresh Token**
+```http
+POST /api/auth/refresh
+Content-Type: application/json
+x-api-key: your_api_key_here_change_in_production
+
+{
+  "refresh_token": "your_refresh_token"
+}
+
+Response: { 
+  "access_token": "new_jwt_access_token"
+}
+```
+
+**Token Details:**
+- Access tokens expire in 15 minutes and are used for protected routes
+- Refresh tokens expire in 7 days and are used to get new access tokens
+- Only access tokens work for protected routes (not refresh tokens)
+
+## API Security
+
+This API implements two layers of security:
+
+1. **API Key Authentication** - Required for all non-authenticated routes (register, login, refresh, public product endpoints)
+   - Add `x-api-key` header with your API key
+   - Prevents unauthorized access to public endpoints
+   - Set in `.env` as `API_KEY`
+
+2. **JWT Authentication** - Required for protected routes (create/update/delete operations)
+   - Add `Authorization: Bearer <access_token>` header
+   - Access tokens expire in 15 minutes
+   - Use refresh tokens to get new access tokens
 
 ### Users (Protected)
 
 **Get all users**
 ```http
-GET /api/users
+GET /api/users?page=1&limit=10
 Authorization: Bearer <token>
+
+Query Parameters:
+- page (optional): Page number (default: 1)
+- limit (optional): Items per page (default: 10, max: 100)
+
+Response includes pagination metadata:
+{
+  "success": true,
+  "message": "Users retrieved successfully",
+  "data": [...],
+  "pagination": {
+    "page": 1,
+    "limit": 10,
+    "total": 50,
+    "from": 1,
+    "to": 10
+  }
+}
+```
+
+**Create user (Admin/Moderator only)**
+```http
+POST /api/users
+Authorization: Bearer <token>
+Content-Type: application/json
+
+{
+  "first_name": "John",
+  "last_name": "Doe",
+  "email": "john.doe@example.com",
+  "password": "securePassword123",
+  "role": "user"
+}
+
+Role Requirements:
+- Only admin and moderator roles can create users
+- Only admin role can create admin users
+- Moderators can only create user and moderator roles
 ```
 
 **Get user by ID**
@@ -119,27 +202,77 @@ Authorization: Bearer <token>
 Content-Type: application/json
 
 {
+  "first_name": "Updated",
+  "last_name": "Name",
   "email": "newemail@example.com",
+  "password": "newPassword123",
   "role": "moderator"
 }
+
+Authorization Rules:
+- Admins can update any user
+- Moderators can update any user except admins
+- Users can only update their own profile
+- Only admins can update admin users
+- Only admins can change a user's role to admin
+- Regular users cannot change their own role
 ```
 
-**Delete user**
+**Delete user (Admin/Moderator only)**
 ```http
 DELETE /api/users/:id
 Authorization: Bearer <token>
+
+Authorization Rules:
+- Only admins and moderators can delete users
+- Admins perform HARD DELETE (permanently removes from database)
+- Moderators perform SOFT DELETE (sets deleted_at timestamp)
+- Only admins can delete admin users
+- Moderators cannot delete admin users
+
+Response (Admin):
+{
+  "success": true,
+  "message": "User permanently deleted successfully"
+}
+
+Response (Moderator):
+{
+  "success": true,
+  "message": "User soft deleted successfully"
+}
 ```
 
 ### Products
 
 **Get all products**
 ```http
-GET /api/products
+GET /api/products?page=1&limit=10
+x-api-key: your_api_key_here_change_in_production
+
+Query Parameters:
+- page (optional): Page number (default: 1)
+- limit (optional): Items per page (default: 10, max: 100)
+
+Response includes pagination metadata:
+{
+  "success": true,
+  "message": "Products retrieved successfully",
+  "data": [...],
+  "pagination": {
+    "page": 1,
+    "limit": 10,
+    "total": 100,
+    "from": 1,
+    "to": 10
+  }
+}
 ```
 
 **Get product by ID**
 ```http
 GET /api/products/:id
+x-api-key: your_api_key_here_change_in_production
 ```
 
 **Create product (Protected)**
@@ -152,6 +285,8 @@ Content-Type: application/json
   "title": "Product Name",
   "price": 99.99
 }
+
+Note: Product title must be unique across all products
 ```
 
 **Update product (Protected)**
@@ -164,12 +299,34 @@ Content-Type: application/json
   "title": "New Name",
   "price": 149.99
 }
+
+Authorization Rules:
+- Admins can update any product
+- Moderators can update any product
+- Users can only update products they created
 ```
 
 **Delete product (Protected)**
 ```http
 DELETE /api/products/:id
 Authorization: Bearer <token>
+
+Authorization Rules:
+- Admins can delete any product (HARD DELETE - permanently removes from database)
+- Moderators can delete any product (SOFT DELETE - sets deleted_at timestamp)
+- Users can only delete products they created (SOFT DELETE - sets deleted_at timestamp)
+
+Response (Admin):
+{
+  "success": true,
+  "message": "Product permanently deleted successfully"
+}
+
+Response (Moderator/User):
+{
+  "success": true,
+  "message": "Product soft deleted successfully"
+}
 ```
 
 ## Database Schema
@@ -260,6 +417,7 @@ All passwords: `password123`
 | DB_PASSWORD | Database password | - |
 | DB_NAME | Database name | - |
 | JWT_SECRET | JWT secret key | - |
+| API_KEY | API key for non-authenticated routes | - |
 
 ## Development vs Production
 

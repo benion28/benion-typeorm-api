@@ -7,6 +7,7 @@ type DatabaseEngine = "mysql" | "postgres";
 
 interface EnvConfig {
   PORT: number;
+  APP_NAME: string;
   NODE_ENV: string;
   DB_ENGINE: DatabaseEngine;
   DB_HOST: string;
@@ -15,6 +16,7 @@ interface EnvConfig {
   DB_PASSWORD: string;
   DB_NAME: string;
   JWT_SECRET: string;
+  API_KEY: string;
 }
 
 const getEnvVariable = (key: string, defaultValue?: string): string => {
@@ -27,6 +29,7 @@ const getEnvVariable = (key: string, defaultValue?: string): string => {
 
 export const envConfig: EnvConfig = {
   PORT: parseInt(getEnvVariable("PORT", "4000"), 10),
+  APP_NAME: getEnvVariable("APP_NAME", "Benion"),
   NODE_ENV: getEnvVariable("NODE_ENV", "development"),
   DB_ENGINE: getEnvVariable("DB_ENGINE", "postgres") as DatabaseEngine,
   DB_HOST: getEnvVariable("DB_HOST"),
@@ -35,6 +38,7 @@ export const envConfig: EnvConfig = {
   DB_PASSWORD: getEnvVariable("DB_PASSWORD"),
   DB_NAME: getEnvVariable("DB_NAME"),
   JWT_SECRET: getEnvVariable("JWT_SECRET"),
+  API_KEY: getEnvVariable("API_KEY"),
 };
 
 // Validate environment
@@ -47,6 +51,7 @@ export const validateEnv = (): void => {
     "DB_PASSWORD",
     "DB_NAME",
     "JWT_SECRET",
+    "API_KEY",
   ];
 
   const missing = requiredVars.filter((key) => !process.env[key]);

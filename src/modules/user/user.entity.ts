@@ -5,13 +5,23 @@ import { Product } from "../product/product.entity";
 
 @Entity("users")
 export class User extends BaseEntity {
+  @Column()
+  first_name!: string;
+
+  @Column()
+  last_name!: string;
+
   @Column({ unique: true })
   email!: string;
 
   @Column()
   password!: string;
 
-  @Column({ type: "enum", enum: ["admin", "moderator", "user"], default: "user" })
+  @Column({
+    type: "enum",
+    enum: ["admin", "moderator", "user"],
+    default: "user",
+  })
   role!: "admin" | "moderator" | "user";
 
   @Column({ nullable: true })

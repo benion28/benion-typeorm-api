@@ -3,26 +3,22 @@
 export type UserRole = "admin" | "moderator" | "user";
 
 export interface IUser {
-  id: string;
-  creator_id?: string;
-  email: string;
-  password: string;
-  role: UserRole;
-  created_at: Date;
-  updated_at: Date;
-  deleted_at?: Date;
-}
-
-export interface IUserResponse {
-  id: string;
-  creator_id?: string;
-  email: string;
-  role: UserRole;
-  created_at: Date;
-  updated_at: Date;
+  id: string | null;
+  first_name: string | null;
+  last_name: string | null;
+  creator_id?: string | null;
+  email: string | null;
+  password: string | null;
+  role: UserRole | null;
+  created_at: string | Date | null;
+  updated_at: string | Date | null;
+  deleted_at?: string | Date | null;
+  creator?: IUser | null;
 }
 
 export interface ICreateUserDTO {
+  first_name: string;
+  last_name: string;
   email: string;
   password: string;
   role?: UserRole;
@@ -30,6 +26,8 @@ export interface ICreateUserDTO {
 }
 
 export interface IUpdateUserDTO {
+  first_name?: string;
+  last_name?: string;
   email?: string;
   password?: string;
   role?: UserRole;
@@ -42,6 +40,7 @@ export interface ILoginDTO {
 }
 
 export interface IAuthResponse {
-  user: IUserResponse;
-  token: string;
+  user: IUser;
+  access_token: string;
+  refresh_token: string;
 }

@@ -9,13 +9,6 @@ export async function seedProducts(
 ): Promise<void> {
   const productRepository = dataSource.getRepository(Product);
 
-  // Check if products already exist
-  const existingProducts = await productRepository.count();
-  if (existingProducts > 0) {
-    console.log("⏭️  Products already seeded, skipping...");
-    return;
-  }
-
   const adminUser = users.find((u) => u.role === "admin");
   const moderatorUser = users.find((u) => u.role === "moderator");
   const regularUser = users.find((u) => u.role === "user");
@@ -24,7 +17,7 @@ export async function seedProducts(
     throw new Error("Users must be seeded before products");
   }
 
-  const products = [
+  const productsToSeed = [
     {
       id: "650e8400-e29b-41d4-a716-446655440001",
       title: "Laptop Pro 15",
@@ -87,8 +80,31 @@ export async function seedProducts(
     },
   ];
 
-  const createdProducts = productRepository.create(products);
-  await productRepository.save(createdProducts);
+  let createdCount = 0;
+  let skippedCount = 0;
 
-  console.log("✅ Seeded 10 products");
+  for (const productData of productsToSeed) {
+    // Check if product already exists by ID
+    const existingProduct = await productRepository.findOne({
+      where: { id: productData.id },
+    });
+
+    if (existingProduct) {
+      console.log(`⏭️  Product "${productData.title}" already exists, skipping...`);
+      skippedCount++;
+    } else {
+      const product = productRepository.create(productData);
+      await productRepository.save(product);
+      console.log(`✅ Created product: ${productData.title}`);
+      createdCount++;
+    }
+  }
+
+  if (skippedCount === productsToSeed.length) {
+    console.log("⏭️  All products already exist, skipping...");
+  } else {
+    console.log(
+      `✅ Seeded ${createdCount} new products (${skippedCount} skipped)`
+    );
+  }
 }

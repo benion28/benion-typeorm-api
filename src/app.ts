@@ -2,10 +2,14 @@
 import express from "express";
 import dotenv from "dotenv";
 import routes from "@/routes";
+import { envConfig } from "./config/env";
+import { ResponseHandler } from "@/common/response";
 
 dotenv.config();
 
 const app = express();
+
+const env = envConfig;
 
 // Middleware
 app.use(express.json());
@@ -16,7 +20,11 @@ app.use("/api", routes);
 
 // Health check
 app.get("/", (_, res) => {
-  res.json({ status: "API is running 🚀" });
+  ResponseHandler.success(
+    res,
+    { status: "running", version: "1.0.0" },
+    `${env.APP_NAME || "TypeORM"} API is running`
+  );
 });
 
 export default app;

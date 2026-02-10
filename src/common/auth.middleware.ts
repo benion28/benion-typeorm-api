@@ -12,10 +12,21 @@ export function auth(req: Request, res: Response, next: NextFunction) {
       return res.status(401).json({ message: "Unauthorized" });
     }
 
-    const payload = jwt.verify(token, env.JWT_SECRET);
+    const payload = jwt.verify(token, env.JWT_SECRET) as {
+      userId: string;
+      type: string;
+    };
+
+    // Only allow access tokens for protected routes
+    if (payload.type !== "access") {
+      return res
+        .status(401)
+        .json({ message: "Invalid token type. Use access token." });
+    }
+
     req.user = payload;
     next();
   } catch (error) {
-    return res.status(401).json({ message: "Invalid token" });
+    return res.status(401).json({ message: "Invalid or expired token" });
   }
 }

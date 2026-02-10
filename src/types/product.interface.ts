@@ -1,14 +1,15 @@
 // types/product.interface.ts
-import { IUserResponse } from "./user.interface";
+import { IUser } from "./user.interface";
 
 export interface IProduct {
-  id: string;
-  creator_id: string;
-  title: string;
-  price: number;
-  created_at: Date;
-  updated_at: Date;
-  deleted_at?: Date;
+  id: string | null;
+  creator_id: string | null;
+  title: string | null;
+  price: number | null;
+  created_at: string | Date | null;
+  updated_at: string | Date | null;
+  deleted_at?: string | Date | null;
+  creator?: IUser | null;
 }
 
 export interface IProductResponse {
@@ -16,7 +17,7 @@ export interface IProductResponse {
   creator_id: string;
   title: string;
   price: number;
-  creator?: IUserResponse;
+  creator?: IUser;
   created_at: Date;
   updated_at: Date;
 }

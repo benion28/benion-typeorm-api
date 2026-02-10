@@ -1,9 +1,11 @@
 // src/server.ts
 import app from "./app";
 import { AppDataSource } from "@/config/database";
-import { env, validateEnv } from "@/config/env";
+import { envConfig, validateEnv } from "@/config/env";
 
-async function bootstrap() {
+const env = envConfig;
+
+const bootstrap = async () => {
   try {
     // Validate environment variables
     validateEnv();

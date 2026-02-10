@@ -4,8 +4,23 @@ import { Product } from "./product.entity";
 import { ICreateProductDTO, IUpdateProductDTO } from "@/types";
 
 export class ProductService {
-  async findAll(): Promise<Product[]> {
-    return ProductRepository.find({ relations: ["creator"] });
+  async findAll(
+    page?: number,
+    limit?: number
+  ): Promise<{ products: Product[]; total: number }> {
+    const queryOptions: any = {
+      relations: ["creator"],
+    };
+
+    // Add pagination if provided
+    if (page !== undefined && limit !== undefined) {
+      queryOptions.skip = (page - 1) * limit;
+      queryOptions.take = limit;
+    }
+
+    const [products, total] = await ProductRepository.findAndCount(queryOptions);
+
+    return { products, total };
   }
 
   async findById(id: string): Promise<Product | null> {
@@ -30,6 +45,10 @@ export class ProductService {
 
   async delete(id: string): Promise<void> {
     await ProductRepository.softDelete(id);
+  }
+
+  async hardDelete(id: string): Promise<void> {
+    await ProductRepository.delete(id);
   }
 }
 
