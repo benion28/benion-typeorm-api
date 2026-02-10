@@ -129,6 +129,45 @@ Response: {
 - Refresh tokens expire in 7 days and are used to get new access tokens
 - Only access tokens work for protected routes (not refresh tokens)
 
+**Get Profile (Protected)**
+```http
+GET /api/auth/profile
+Authorization: Bearer <token>
+
+Response:
+{
+  "success": true,
+  "message": "Profile retrieved successfully",
+  "data": {
+    "id": "550e8400-e29b-41d4-a716-446655440001",
+    "first_name": "John",
+    "last_name": "Doe",
+    "email": "john.doe@example.com",
+    "role": "user",
+    "created_at": "2026-02-10T09:20:58.775Z",
+    "updated_at": "2026-02-10T09:20:58.775Z",
+    "creator": null
+  }
+}
+```
+
+**Change Password (Protected)**
+```http
+PUT /api/auth/change-password
+Authorization: Bearer <token>
+Content-Type: application/json
+
+{
+  "current_password": "oldPassword123",
+  "new_password": "newSecurePassword456"
+}
+
+Requirements:
+- Current password must be correct
+- New password must be at least 6 characters
+- Returns success message on completion
+```
+
 ## API Security
 
 This API implements two layers of security:

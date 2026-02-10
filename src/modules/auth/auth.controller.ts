@@ -79,6 +79,73 @@ export class AuthController {
       );
     }
   }
+
+  async getProfile(req: Request, res: Response) {
+    try {
+      const userId = (req.user as any)?.userId;
+
+      if (!userId) {
+        return ResponseHandler.unauthorized(res, "User not authenticated");
+      }
+
+      const profile = await authService.getProfile(userId);
+      return ResponseHandler.success(res, profile, "Profile retrieved successfully");
+    } catch (error: any) {
+      return ResponseHandler.serverError(
+        res,
+        "Failed to fetch profile",
+        error.message
+      );
+    }
+  }
+
+  async changePassword(req: Request, res: Response) {
+    try {
+      const userId = (req.user as any)?.userId;
+
+      if (!userId) {
+        return ResponseHandler.unauthorized(res, "User not authenticated");
+      }
+
+      const { current_password, new_password } = req.body;
+
+      if (!current_password || !new_password) {
+        return ResponseHandler.badRequest(
+          res,
+          "Validation failed",
+          [
+            !current_password && {
+              field: "current_password",
+              message: "Current password is required",
+            },
+            !new_password && {
+              field: "new_password",
+              message: "New password is required",
+            },
+          ].filter(Boolean) as { field: string; message: string }[]
+        );
+      }
+
+      if (new_password.length < 6) {
+        return ResponseHandler.badRequest(
+          res,
+          "New password must be at least 6 characters long"
+        );
+      }
+
+      await authService.changePassword(userId, current_password, new_password);
+      return ResponseHandler.success(res, null, "Password changed successfully");
+    } catch (error: any) {
+      if (error.message === "Current password is incorrect") {
+        return ResponseHandler.badRequest(res, error.message);
+      }
+      return ResponseHandler.serverError(
+        res,
+        "Failed to change password",
+        error.message
+      );
+    }
+  }
 }
 
 export const authController = new AuthController();

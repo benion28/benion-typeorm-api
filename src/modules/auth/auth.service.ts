@@ -83,9 +83,41 @@ export class AuthService {
     }
   }
 
+  async getProfile(userId: string) {
+    const user = await userService.findById(userId);
+    if (!user) {
+      throw new Error("User not found");
+    }
+    return UserModel.toJSON(user);
+  }
+
+  async changePassword(
+    userId: string,
+    currentPassword: string,
+    newPassword: string
+  ): Promise<void> {
+    // Get user with password field
+    const user = await userService.findByEmail(
+      (await userService.findById(userId))?.email || ""
+    );
+
+    if (!user) {
+      throw new Error("User not found");
+    }
+
+    // Verify current password
+    const isValidPassword = await bcrypt.compare(currentPassword, user.password);
+    if (!isValidPassword) {
+      throw new Error("Current password is incorrect");
+    }
+
+    // Update password
+    await userService.update(userId, { password: newPassword });
+  }
+
   private generateAccessToken(userId: string): string {
     return jwt.sign({ userId, type: "access" }, env.JWT_SECRET, {
-      expiresIn: "15m", // Short-lived access token
+      expiresIn: "24h", // Short-lived access token
     });
   }
 
