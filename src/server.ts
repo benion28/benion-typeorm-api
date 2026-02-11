@@ -14,8 +14,8 @@ const bootstrap = async () => {
     await prisma.$connect();
     console.log("📦 Database connected with Prisma");
 
-    // Start server
-    app.listen(env.PORT, () => {
+    // Start server - bind to 0.0.0.0 for Docker/Render
+    app.listen(env.PORT, '0.0.0.0', () => {
       console.log(`🚀 Server running on port ${env.PORT}`);
       console.log(`📍 Environment: ${env.NODE_ENV}`);
     });
