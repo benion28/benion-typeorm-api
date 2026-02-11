@@ -19,7 +19,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use("/api", routes);
 
 // Health check
-app.get("/", (_, res) => {
+app.get("/health", (_, res) => {
   ResponseHandler.success(
     res,
     { status: "running", version: "1.0.0" },
