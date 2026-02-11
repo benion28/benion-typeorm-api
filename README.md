@@ -50,7 +50,13 @@ JWT_SECRET=your_secret_key
 API_KEY=your_api_key_here_change_in_production
 ```
 
-**Note:** The `DATABASE_URL` is automatically constructed from the individual database components. For PostgreSQL, change `DB_ENGINE=postgresql`.
+**Note:** The `DATABASE_URL` is automatically constructed from the individual database components. 
+
+**To switch between MySQL and PostgreSQL:**
+1. Change `DB_ENGINE` to either `mysql` or `postgresql`
+2. Update the other DB_* variables accordingly
+3. Update `DATABASE_URL` to match
+4. Run `npm run schema:switch` (or any db: command which does this automatically)
 
 3. **Create the database:**
 ```sql
@@ -79,7 +85,26 @@ npm run dev
 
 ## Database Management
 
+### **Schema Switching:**
+
+This project supports both MySQL and PostgreSQL. The appropriate schema is automatically selected based on your `DB_ENGINE` environment variable.
+
+**Available schema files:**
+- `prisma/schema.mysql.prisma` - MySQL configuration
+- `prisma/schema.postgresql.prisma` - PostgreSQL configuration
+- `prisma/schema.prisma` - Active schema (auto-generated)
+
+**Manual schema switch:**
+```bash
+npm run schema:switch
+```
+
+This command reads your `DB_ENGINE` from `.env` and copies the appropriate schema file to `schema.prisma`.
+
 ### **Development Workflow:**
+
+All database commands automatically switch to the correct schema before running:
+
 ```bash
 # Generate Prisma client after schema changes
 npm run db:generate
@@ -96,6 +121,8 @@ npm run db:seed
 # Open Prisma Studio (database GUI)
 npm run db:studio
 ```
+
+**Note:** The `schema:switch` command runs automatically before most Prisma commands, so you don't need to run it manually unless you're using Prisma CLI directly.
 
 ## API Endpoints
 

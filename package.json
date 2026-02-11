@@ -8,12 +8,13 @@
     "dev": "ts-node-dev --respawn --transpile-only -r tsconfig-paths/register src/server.ts",
     "build": "tsc",
     "start": "node dist/server.js",
-    "db:generate": "prisma generate",
-    "db:push": "prisma db push",
-    "db:migrate": "prisma migrate dev",
-    "db:migrate:deploy": "prisma migrate deploy",
+    "schema:switch": "node scripts/switch-schema.js",
+    "db:generate": "npm run schema:switch && prisma generate",
+    "db:push": "npm run schema:switch && prisma db push",
+    "db:migrate": "npm run schema:switch && prisma migrate dev",
+    "db:migrate:deploy": "npm run schema:switch && prisma migrate deploy",
     "db:seed": "ts-node -r tsconfig-paths/register prisma/seed.ts",
-    "db:studio": "prisma studio"
+    "db:studio": "npm run schema:switch && prisma studio"
   },
   "author": "Bernard Iorver",
   "license": "MIT",
