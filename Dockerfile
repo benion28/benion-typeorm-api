@@ -15,7 +15,10 @@ RUN npm ci
 COPY scripts ./scripts
 COPY prisma ./prisma
 
-# Generate schema.prisma from source schemas (defaults to MySQL)
+# Set default DB_ENGINE to postgres for production (Render uses PostgreSQL)
+ENV DB_ENGINE=postgres
+
+# Generate schema.prisma from source schemas based on DB_ENGINE
 RUN node scripts/switch-schema.js || echo "Schema switch failed, using existing schema"
 
 # Generate Prisma Client
@@ -50,7 +53,10 @@ RUN npm ci --only=production
 COPY scripts ./scripts
 COPY prisma ./prisma
 
-# Generate schema.prisma from source schemas
+# Set default DB_ENGINE to postgres for production (Render uses PostgreSQL)
+ENV DB_ENGINE=postgres
+
+# Generate schema.prisma from source schemas based on DB_ENGINE
 RUN node scripts/switch-schema.js || echo "Schema switch failed, using existing schema"
 
 # Generate Prisma Client
