@@ -55,16 +55,16 @@ async function main() {
 
   // Create products
   const products = [
-    { id: '1', title: 'Wireless Bluetooth Headphones', price: 79.99, creator_id: users[0].id },
-    { id: '2', title: 'Ergonomic Office Chair', price: 249.50, creator_id: users[1].id },
-    { id: '3', title: 'Stainless Steel Water Bottle', price: 24.99, creator_id: users[2].id },
-    { id: '4', title: 'Mechanical Gaming Keyboard', price: 129.99, creator_id: users[0].id },
-    { id: '5', title: '4K Ultra HD Monitor', price: 399.00, creator_id: users[1].id },
-    { id: '6', title: 'Organic Cotton T-Shirt', price: 19.95, creator_id: users[2].id },
-    { id: '7', title: 'Smart Fitness Tracker', price: 89.99, creator_id: users[0].id },
-    { id: '8', title: 'Portable Phone Charger', price: 34.99, creator_id: users[1].id },
-    { id: '9', title: 'Noise Cancelling Earbuds', price: 159.99, creator_id: users[2].id },
-    { id: '10', title: 'LED Desk Lamp', price: 45.00, creator_id: users[0].id },
+    { id: '650e8400-e29b-41d4-a716-446655440001', title: 'Wireless Bluetooth Headphones', price: 79.99, creator_id: users[0].id },
+    { id: '650e8400-e29b-41d4-a716-446655440002', title: 'Ergonomic Office Chair', price: 249.50, creator_id: users[1].id },
+    { id: '650e8400-e29b-41d4-a716-446655440003', title: 'Stainless Steel Water Bottle', price: 24.99, creator_id: users[2].id },
+    { id: '650e8400-e29b-41d4-a716-446655440004', title: 'Mechanical Gaming Keyboard', price: 129.99, creator_id: users[0].id },
+    { id: '650e8400-e29b-41d4-a716-446655440005', title: '4K Ultra HD Monitor', price: 399.00, creator_id: users[1].id },
+    { id: '650e8400-e29b-41d4-a716-446655440006', title: 'Organic Cotton T-Shirt', price: 19.95, creator_id: users[2].id },
+    { id: '650e8400-e29b-41d4-a716-446655440007', title: 'Smart Fitness Tracker', price: 89.99, creator_id: users[0].id },
+    { id: '650e8400-e29b-41d4-a716-446655440008', title: 'Portable Phone Charger', price: 34.99, creator_id: users[1].id },
+    { id: '650e8400-e29b-41d4-a716-446655440009', title: 'Noise Cancelling Earbuds', price: 159.99, creator_id: users[2].id },
+    { id: '650e8400-e29b-41d4-a716-446655440010', title: 'LED Desk Lamp', price: 45.00, creator_id: users[0].id },
   ]
 
   for (const productData of products) {

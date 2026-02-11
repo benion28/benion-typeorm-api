@@ -20,20 +20,24 @@ export class UserService {
           first_name: true,
           last_name: true,
           email: true,
+          password: true,
           role: true,
           creator_id: true,
           created_at: true,
           updated_at: true,
+          deleted_at: true,
           creator: {
             select: {
               id: true,
               first_name: true,
               last_name: true,
               email: true,
+              password: true,
               role: true,
               creator_id: true,
               created_at: true,
               updated_at: true,
+              deleted_at: true,
             }
           }
         },
@@ -62,20 +66,24 @@ export class UserService {
         first_name: true,
         last_name: true,
         email: true,
+        password: true,
         role: true,
         creator_id: true,
         created_at: true,
         updated_at: true,
+        deleted_at: true,
         creator: {
           select: {
             id: true,
             first_name: true,
             last_name: true,
             email: true,
+            password: true,
             role: true,
             creator_id: true,
             created_at: true,
             updated_at: true,
+            deleted_at: true,
           }
         }
       }

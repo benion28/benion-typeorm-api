@@ -135,7 +135,7 @@ export class AuthService {
 
   private generateAccessToken(userId: string): string {
     return jwt.sign({ userId, type: "access" }, env.JWT_SECRET, {
-      expiresIn: "15m", // Short-lived access token
+      expiresIn: "24h", // Short-lived access token
     });
   }
 
