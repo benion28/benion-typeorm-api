@@ -57,6 +57,12 @@ coverage/
 typeorm.log
 
 # =========================
+# Prisma
+# =========================
+# Auto-generated schema (use schema.mysql.prisma or schema.postgresql.prisma)
+prisma
+
+# =========================
 # Docker (if added later)
 # =========================
 docker-data/

@@ -1,0 +1,57 @@
+# Render Blueprint for TypeORM API
+# This file allows you to deploy your entire stack with one click
+
+services:
+  # Web Service
+  - type: web
+    name: typeorm-api
+    runtime: docker
+    plan: free # Change to 'starter' or 'standard' for production
+    branch: main
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 4000
+      - key: APP_NAME
+        value: TypeORM API
+      - key: DB_ENGINE
+        value: postgresql # Render blueprints only support PostgreSQL
+      - key: DB_HOST
+        fromDatabase:
+          name: typeorm-db
+          property: host
+      - key: DB_PORT
+        fromDatabase:
+          name: typeorm-db
+          property: port
+      - key: DB_USERNAME
+        fromDatabase:
+          name: typeorm-db
+          property: user
+      - key: DB_PASSWORD
+        fromDatabase:
+          name: typeorm-db
+          property: password
+      - key: DB_NAME
+        fromDatabase:
+          name: typeorm-db
+          property: database
+      - key: JWT_SECRET
+        generateValue: true
+        sync: false
+      - key: API_KEY
+        generateValue: true
+        sync: false
+      - key: SEED_DATABASE
+        value: true # Set to false after first deployment
+
+databases:
+  # PostgreSQL Database (Render only supports PostgreSQL in blueprints)
+  - name: typeorm-db
+    databaseName: typeorm_db
+    user: typeorm_user
+    plan: free # Change to 'starter' for production
+    # Note: Render blueprints only support PostgreSQL
+    # For MySQL, you must create it manually through the dashboard
