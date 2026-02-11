@@ -1,4 +1,5 @@
 import { IProduct, IUser } from "@/types";
+import { Decimal } from "@prisma/client/runtime/library";
 import dateUtil from "@/utils/date";
 import { UserModel } from "./user.model";
 
@@ -6,7 +7,7 @@ export class ProductModel implements IProduct {
   id: string | null;
   creator_id: string | null;
   title: string | null;
-  price: number | null;
+  price: number | Decimal | null;
   created_at: string | Date | null;
   updated_at: string | Date | null;
   deleted_at?: string | Date | null;
@@ -41,11 +42,16 @@ export class ProductModel implements IProduct {
   static toJSON(product: Partial<IProduct>): any {
     const { safeToISOString } = dateUtil;
 
+    // Convert Decimal to number for JSON serialization
+    const price = product.price instanceof Decimal 
+      ? product.price.toNumber() 
+      : product.price;
+
     return {
       id: product.id ?? null,
       creator_id: product.creator_id ?? null,
       title: product.title ?? null,
-      price: product.price ?? null,
+      price: price ?? null,
       created_at: safeToISOString(
         product.created_at as Date | string | null | undefined
       ),

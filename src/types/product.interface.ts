@@ -1,11 +1,12 @@
 // types/product.interface.ts
+import { Decimal } from "@prisma/client/runtime/library";
 import { IUser } from "./user.interface";
 
 export interface IProduct {
   id: string | null;
   creator_id: string | null;
   title: string | null;
-  price: number | null;
+  price: number | Decimal | null;
   created_at: string | Date | null;
   updated_at: string | Date | null;
   deleted_at?: string | Date | null;
