@@ -17,7 +17,7 @@ services:
       - key: APP_NAME
         value: TypeORM API
       - key: DB_ENGINE
-        value: postgresql # Render blueprints only support PostgreSQL
+        value: postgres # TypeORM uses "postgres" not "postgresql"
       - key: DB_HOST
         fromDatabase:
           name: typeorm-db
