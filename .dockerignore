@@ -48,6 +48,7 @@ __tests__/
 README.md
 docs/
 *.md
+!prisma/README.md
 
 # Docker
 Dockerfile
@@ -60,12 +61,17 @@ docker-compose*.yml
 .travis.yml
 
 # TypeORM (no longer used)
-src/database/migrations/
-src/database/seeders/
-src/database/data-source.ts
-src/database/seed.ts
+src/database/
 
 # Misc
 .editorconfig
 .prettierrc
 .eslintrc*
+
+# Prisma - Keep these files
+!prisma/
+!prisma/schema.prisma
+!prisma/schema.mysql.prisma
+!prisma/schema.postgresql.prisma
+!prisma/seed.ts
+!prisma/migrations/

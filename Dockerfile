@@ -11,8 +11,12 @@ COPY tsconfig.json ./
 # Install all dependencies (including dev dependencies for build)
 RUN npm ci
 
-# Copy Prisma schema
+# Copy schema switching script and Prisma schemas
+COPY scripts ./scripts
 COPY prisma ./prisma
+
+# Generate schema.prisma from source schemas (defaults to MySQL)
+RUN node scripts/switch-schema.js || echo "Schema switch failed, using existing schema"
 
 # Generate Prisma Client
 RUN npx prisma generate
@@ -42,8 +46,14 @@ COPY package*.json ./
 # Install only production dependencies
 RUN npm ci --only=production
 
-# Copy Prisma schema and generate client
+# Copy schema switching script and Prisma schemas
+COPY scripts ./scripts
 COPY prisma ./prisma
+
+# Generate schema.prisma from source schemas
+RUN node scripts/switch-schema.js || echo "Schema switch failed, using existing schema"
+
+# Generate Prisma Client
 RUN npx prisma generate
 
 # Copy built application from builder
