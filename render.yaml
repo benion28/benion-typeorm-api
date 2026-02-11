@@ -1,0 +1,59 @@
+# Render Blueprint for Prisma API
+# This file allows you to deploy your entire stack with one click
+
+services:
+  # Web Service
+  - type: web
+    name: benion-prisma-api
+    runtime: docker
+    plan: free # Change to 'starter' or 'standard' for production
+    branch: main
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 4000
+      - key: APP_NAME
+        value: Prisma API
+      - key: DB_ENGINE
+        value: postgres # Render blueprints only support PostgreSQL
+      - key: DB_HOST
+        fromDatabase:
+          name: prisma-db
+          property: host
+      - key: DB_PORT
+        fromDatabase:
+          name: prisma-db
+          property: port
+      - key: DB_USERNAME
+        fromDatabase:
+          name: prisma-db
+          property: user
+      - key: DB_PASSWORD
+        fromDatabase:
+          name: prisma-db
+          property: password
+      - key: DB_NAME
+        fromDatabase:
+          name: prisma-db
+          property: database
+      - key: DATABASE_URL
+        fromDatabase:
+          name: prisma-db
+          property: connectionString
+      - key: JWT_SECRET
+        generateValue: true
+      - key: API_KEY
+        generateValue: true
+      - key: SEED_DATABASE
+        value: true # Set to false after first deployment
+
+databases:
+  # PostgreSQL Database (Render only supports PostgreSQL in blueprints)
+  - name: prisma-db
+    databaseName: prisma_db
+    user: prisma_user
+    plan: free # Change to 'starter' for production
+    # Note: Render blueprints only support PostgreSQL
+    # For MySQL, you must create it manually through the dashboard
