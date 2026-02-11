@@ -28,8 +28,14 @@ const getEnvVariable = (key: string, defaultValue?: string): string => {
   return value;
 };
 
-// Construct DATABASE_URL from individual components
+// Construct DATABASE_URL from individual components if not provided
 const constructDatabaseUrl = (): string => {
+  // If DATABASE_URL is already set, use it
+  if (process.env.DATABASE_URL) {
+    return process.env.DATABASE_URL;
+  }
+
+  // Otherwise, construct from individual components
   const engine = getEnvVariable("DB_ENGINE", "mysql");
   const username = getEnvVariable("DB_USERNAME");
   const password = getEnvVariable("DB_PASSWORD");
@@ -53,7 +59,7 @@ export const envConfig: EnvConfig = {
   DB_USERNAME: getEnvVariable("DB_USERNAME"),
   DB_PASSWORD: getEnvVariable("DB_PASSWORD"),
   DB_NAME: getEnvVariable("DB_NAME"),
-  DATABASE_URL: constructDatabaseUrl(),
+  DATABASE_URL: getEnvVariable("DATABASE_URL", constructDatabaseUrl()),
   JWT_SECRET: getEnvVariable("JWT_SECRET"),
   API_KEY: getEnvVariable("API_KEY"),
 };
