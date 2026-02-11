@@ -40,10 +40,8 @@ services:
           property: database
       - key: JWT_SECRET
         generateValue: true
-        sync: false
       - key: API_KEY
         generateValue: true
-        sync: false
       - key: SEED_DATABASE
         value: true # Set to false after first deployment
 
