@@ -11,6 +11,9 @@ COPY tsconfig.json ./
 # Install all dependencies (including dev dependencies for build)
 RUN npm ci
 
+# Install tsc-alias for path resolution
+RUN npm install --save-dev tsc-alias
+
 # Copy source code
 COPY . .
 
@@ -38,7 +41,7 @@ COPY tsconfig.json ./
 RUN npm ci --only=production
 
 # Install TypeScript tooling needed for migrations and path aliases
-RUN npm install --save ts-node tsconfig-paths typescript @types/node
+RUN npm install --save ts-node tsconfig-paths typescript tsc-alias @types/node
 
 # Copy built application from builder
 COPY --from=builder /app/dist ./dist
