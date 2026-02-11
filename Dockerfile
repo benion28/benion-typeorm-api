@@ -8,9 +8,8 @@ WORKDIR /app
 COPY package*.json ./
 COPY tsconfig.json ./
 
-# Install dependencies
-RUN npm ci --only=production && \
-    npm ci --only=development
+# Install all dependencies (including dev dependencies for build)
+RUN npm ci
 
 # Copy source code
 COPY . .
@@ -33,14 +32,23 @@ WORKDIR /app
 
 # Copy package files
 COPY package*.json ./
+COPY tsconfig.json ./
 
 # Install only production dependencies
-RUN npm ci --only=production && \
-    npm cache clean --force
+RUN npm ci --only=production
+
+# Install TypeScript tooling needed for migrations and path aliases
+RUN npm install --save ts-node tsconfig-paths typescript @types/node
 
 # Copy built application from builder
 COPY --from=builder /app/dist ./dist
-COPY --from=builder /app/src/database/migrations ./dist/database/migrations
+
+# Copy source files needed for migrations and seeding
+COPY --from=builder /app/src/database ./src/database
+COPY --from=builder /app/src/modules ./src/modules
+COPY --from=builder /app/src/common ./src/common
+COPY --from=builder /app/src/config ./src/config
+COPY --from=builder /app/src/types ./src/types
 
 # Copy entrypoint script
 COPY docker-entrypoint.sh ./

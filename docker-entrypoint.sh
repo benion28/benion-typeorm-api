@@ -53,7 +53,7 @@ wait_for_db
 
 # Run migrations
 echo "🔄 Running database migrations..."
-if npm run migration:run; then
+if npm run migration:run:prod; then
     echo "✅ Migrations completed successfully"
 else
     echo "⚠️  Migration failed or no pending migrations"
@@ -62,7 +62,7 @@ fi
 # Run seeders (optional - only if SEED_DATABASE is set to true)
 if [ "$SEED_DATABASE" = "true" ]; then
     echo "🌱 Running database seeders..."
-    if npm run seed; then
+    if npm run seed:prod; then
         echo "✅ Seeding completed successfully"
     else
         echo "⚠️  Seeding failed or data already exists"
@@ -73,4 +73,4 @@ fi
 
 # Start the application
 echo "🎯 Starting Node.js application..."
-exec node dist/server.js
+exec npm start
