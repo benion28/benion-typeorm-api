@@ -13,7 +13,7 @@ services:
       - key: NODE_ENV
         value: production
       - key: PORT
-        value: 4000
+        value: 10000
       - key: APP_NAME
         value: TypeORM API
       - key: DB_ENGINE
