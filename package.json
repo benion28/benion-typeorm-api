@@ -17,8 +17,7 @@
     "db:migrate:status": "prisma migrate status",
     "db:migrate:reset": "npm run schema:switch && prisma migrate reset",
     "db:seed": "node -r tsconfig-paths/register -r ts-node/register prisma/seed.ts",
-    "db:studio": "npm run schema:switch && prisma studio",
-    "postinstall": "prisma generate"
+    "db:studio": "npm run schema:switch && prisma studio"
   },
   "author": "Bernard Iorver",
   "license": "MIT",

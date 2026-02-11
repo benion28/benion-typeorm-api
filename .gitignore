@@ -62,6 +62,12 @@ typeorm.log
 # Auto-generated schema (use schema.mysql.prisma or schema.postgresql.prisma)
 prisma/schema.prisma
 
+# Keep the source schemas in git
+!prisma/schema.mysql.prisma
+!prisma/schema.postgresql.prisma
+!prisma/seed.ts
+!prisma/migrations/
+
 # =========================
 # Docker (if added later)
 # =========================
