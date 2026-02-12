@@ -33,8 +33,8 @@ RUN npm run build
 # Production stage
 FROM node:20-alpine
 
-# Install dumb-init for proper signal handling
-RUN apk add --no-cache dumb-init
+# Install dumb-init and OpenSSL for Prisma
+RUN apk add --no-cache dumb-init openssl1.1-compat
 
 # Create app user
 RUN addgroup -g 1001 -S nodejs && \
@@ -48,6 +48,9 @@ COPY package*.json ./
 
 # Install only production dependencies
 RUN npm ci --only=production
+
+# Install additional dependencies needed for seeding
+RUN npm install ts-node tsconfig-paths typescript @types/node
 
 # Copy schema switching script and Prisma schemas
 COPY scripts ./scripts
