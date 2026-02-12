@@ -3,7 +3,7 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
-type DatabaseEngine = "mysql" | "postgresql";
+type DatabaseEngine = "mysql" | "postgres" | "postgresql";
 
 interface EnvConfig {
   PORT: number;
@@ -43,8 +43,8 @@ const constructDatabaseUrl = (): string => {
   const port = getEnvVariable("DB_PORT");
   const database = getEnvVariable("DB_NAME");
 
-  // Handle different database engines
-  const protocol = engine === "postgresql" ? "postgresql" : "mysql";
+  // Handle different database engines (normalize postgres/postgresql)
+  const protocol = (engine === "postgresql" || engine === "postgres") ? "postgresql" : "mysql";
   
   return `${protocol}://${username}:${password}@${host}:${port}/${database}`;
 };
@@ -85,10 +85,10 @@ export const validateEnv = (): void => {
     );
   }
 
-  // Validate DB_ENGINE
-  if (!["mysql", "postgresql"].includes(envConfig.DB_ENGINE)) {
+  // Validate DB_ENGINE (accept both postgres and postgresql)
+  if (!["mysql", "postgres", "postgresql"].includes(envConfig.DB_ENGINE)) {
     throw new Error(
-      `Invalid DB_ENGINE: ${envConfig.DB_ENGINE}. Must be 'mysql' or 'postgresql'`
+      `Invalid DB_ENGINE: ${envConfig.DB_ENGINE}. Must be 'mysql', 'postgres', or 'postgresql'`
     );
   }
 
