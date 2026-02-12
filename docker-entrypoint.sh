@@ -7,6 +7,14 @@ echo "🚀 Starting application entrypoint..."
 echo "⏳ Waiting for database to be ready..."
 sleep 5
 
+# Switch schema based on DB_ENGINE environment variable
+echo "🔄 Switching Prisma schema based on DB_ENGINE=${DB_ENGINE}..."
+if node scripts/switch-schema.js; then
+    echo "✅ Schema switched successfully"
+else
+    echo "⚠️  Schema switch failed, using existing schema"
+fi
+
 # Run Prisma migrations (Prisma will retry if database isn't ready yet)
 echo "🔄 Running Prisma migrations..."
 if npx prisma migrate deploy; then

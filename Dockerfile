@@ -52,8 +52,8 @@ COPY package*.json ./
 # Install only production dependencies
 RUN npm ci --only=production
 
-# Install additional dependencies needed for seeding
-RUN npm install ts-node tsconfig-paths typescript @types/node
+# Install tsx for running TypeScript seed files
+RUN npm install tsx
 
 # Copy schema switching script and Prisma schemas
 COPY scripts ./scripts

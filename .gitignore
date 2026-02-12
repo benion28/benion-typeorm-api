@@ -62,6 +62,9 @@ typeorm.log
 # Auto-generated schema (use schema.mysql.prisma or schema.postgresql.prisma)
 prisma/schema.prisma
 
+# Auto-generated migration lock file (dynamically created based on DB_ENGINE)
+prisma/migrations/migration_lock.toml
+
 # Keep the source schemas in git
 !prisma/schema.mysql.prisma
 !prisma/schema.postgresql.prisma
