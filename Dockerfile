@@ -30,15 +30,18 @@ COPY . .
 # Build TypeScript
 RUN npm run build
 
-# Production stage
-FROM node:20-alpine
+# Production stage - Use Debian for better Prisma compatibility
+FROM node:20-slim
 
 # Install dumb-init and OpenSSL for Prisma
-RUN apk add --no-cache dumb-init openssl1.1-compat
+RUN apt-get update && apt-get install -y \
+    dumb-init \
+    openssl \
+    && rm -rf /var/lib/apt/lists/*
 
 # Create app user
-RUN addgroup -g 1001 -S nodejs && \
-    adduser -S nodejs -u 1001
+RUN groupadd -g 1001 nodejs && \
+    useradd -r -u 1001 -g nodejs nodejs
 
 # Set working directory
 WORKDIR /app
