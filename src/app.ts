@@ -18,17 +18,8 @@ app.use(express.urlencoded({ extended: true }));
 // Routes
 app.use("/api", routes);
 
-// Health check at root (for Render health checks)
+// Health check
 app.get("/health", (_, res) => {
-  ResponseHandler.success(
-    res,
-    { status: "running", version: "1.0.0" },
-    `${env.APP_NAME || "Prisma"} API is running`
-  );
-});
-
-// Health check at /api/health (for API consumers)
-app.get("/api/health", (_, res) => {
   ResponseHandler.success(
     res,
     { status: "running", version: "1.0.0" },
